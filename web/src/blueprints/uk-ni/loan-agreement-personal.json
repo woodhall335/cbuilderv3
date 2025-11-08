@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "kind": "contract",
+  "slug": "loan-agreement-personal",
+  "title": "Loan Agreement (Personal)",
+  "jurisdiction": "uk-ni",
+  "category": "Finance & Lending",
+  "summary": "Curated Loan Agreement (Personal) for Northern Ireland.",
+  "seo": {
+    "guide": [
+      "When to use the Loan Agreement (Personal)",
+      "Key protections and how they work",
+      "What differs in Northern Ireland",
+      "Why Contract Heaven (curation, 7-day editing, PDF pack)"
+    ],
+    "faqs": [
+      {
+        "q": "Is this valid in Northern Ireland?",
+        "a": "It’s curated to align with current standards in Northern Ireland. Provide accurate details and review before use."
+      },
+      {
+        "q": "Can I edit after purchase?",
+        "a": "Yes — inline editing is available for 7 days before lock."
+      }
+    ],
+    "related": []
+  },
+  "requiredClauses": [
+    "parties",
+    "scope_or_role",
+    "payment_or_salary",
+    "term_or_notice",
+    "confidentiality",
+    "ip_or_ownership",
+    "data_protection",
+    "governing_law"
+  ],
+  "lawPack": [
+    {
+      "cite": "UK GDPR / DPA 2018 (NI)"
+    }
+  ],
+  "sections": [
+    {
+      "id": "parties",
+      "title": "Parties",
+      "fields": [
+        {
+          "id": "party_a_name",
+          "label": "Party A name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "party_a_address",
+          "label": "Party A address",
+          "type": "address",
+          "required": true
+        },
+        {
+          "id": "party_b_name",
+          "label": "Party B name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "party_b_address",
+          "label": "Party B address",
+          "type": "address",
+          "required": true
+        },
+        {
+          "id": "effective_date",
+          "label": "Effective date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "id": "contact_email",
+          "label": "Contact email",
+          "type": "email",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "clauses": [
+    {
+      "id": "parties",
+      "type": "variable",
+      "title": "Parties",
+      "template": "This document is between {{party_a_name}} of {{party_a_address}} and {{party_b_name}} of {{party_b_address}}, effective {{effective_date}}."
+    },
+    {
+      "id": "governing_law",
+      "type": "fixed",
+      "title": "Governing Law",
+      "template": "This document is governed by the laws of Northern Ireland."
+    }
+  ],
+  "signatures": {
+    "parties": [
+      {
+        "role": "Party A",
+        "nameField": "party_a_name"
+      },
+      {
+        "role": "Party B",
+        "nameField": "party_b_name"
+      }
+    ],
+    "eSignAllowed": true
+  },
+  "certificate": {
+    "statement": "Curated by Contract Heaven and completed by you. Prepared using the information provided on the date of generation.",
+    "preparedForFields": [
+      "party_a_name",
+      "party_b_name",
+      "effective_date",
+      "contact_email"
+    ],
+    "preparedBy": "Contract Heaven"
+  }
+}

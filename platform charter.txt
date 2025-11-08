@@ -1,0 +1,156 @@
+Contract Heaven — Platform Charter (UK v1)
+Purpose
+
+Deliver a helpful, UK-specific document platform that turns free guidance into high-trust paid outcomes. Public copy avoids “AI”; outputs include a Certificate of Curation and Applicable Laws Summary.
+
+Scope (UK-only v1)
+
+Jurisdictions: England & Wales (uk-ew), Scotland (uk-sc), Northern Ireland (uk-ni).
+
+Products:
+
+Ask Heaven (free Q&A; 200-word answers with 1–3 statute refs).
+
+Letters: Basic (free) and Custom (paid £5–£7) with free Day-7 follow-up; optional E-sign £3.
+
+Small Claims Court Pack: £19 (escalation) / £29 (standalone).
+
+Contracts: £10 via Contract Wizard; optional E-sign £3.
+
+Rewrite: £40 from analyser.
+
+OCR Translation: £20.
+
+Brand & Compliance
+
+Public phrasing: “Curated by Contract Heaven. Completed by You.”
+
+Clear scope: we prepare paperwork; users file/serve; not legal advice.
+
+Jurisdiction depth via thin law-packs (acts/sections) and automated assertions before unlock.
+
+Information Architecture (ISR everywhere)
+
+/ (Home) → Ask Heaven widget (question + region + name + email).
+
+/ask → /ask/result (answer + smart CTAs).
+
+/letters → /letters/[region]/[slug] (basic preview; upsell to Custom; Day-7 follow-up).
+
+/contracts → /contracts/[region]/[slug] (SEO page → wizard).
+
+/contract-wizard (select contract + region → dynamic form → 2-page preview → pay).
+
+/packs/small-claims (checkout → pack).
+
+/dashboard (user docs, follow-ups, statuses), /admin (orders, QA, content flags).
+
+Blog, pricing, tools, legal pages, status, 404.
+
+Event Taxonomy (emit to Supabase events)
+
+ask.submitted {question,jurisdiction,user}
+
+letter.created {slug,jurisdiction,user,paid:boolean}
+
+letter.followup.scheduled {letterId,sendAt}
+
+pack.purchased {caseId,jurisdiction,issue}
+
+contract.purchased {slug,jurisdiction}
+
+rewrite.purchased {sourceType}
+
+translation.purchased {sourceType}
+
+esign.added {docType,docId}
+
+Data Contracts (Zod in packages/types)
+
+Jurisdiction = 'uk-ew' | 'uk-sc' | 'uk-ni'
+
+UserProfile { name:string; email:string; region:Jurisdiction }
+
+CustomLetterInput { slug:string; jurisdiction:Jurisdiction; facts:Record<string,any>; user:UserProfile }
+
+ContractInput { slug:string; jurisdiction:Jurisdiction; answers:Record<string,any>; user:UserProfile }
+
+ClaimsPackInput { issue:'invoice'|'deposit'|'repairs'|...; jurisdiction:Jurisdiction; facts:...; user:UserProfile }
+
+Generation Rails
+
+Hybrid models: low-cost model for Ask/preview/free basic; Grok (reasoning) for paid outputs (Custom Letter, Contract, Claims Pack, Rewrite).
+
+Law-packs: lawPacks[jurisdiction] injected into prompts.
+
+Assertions: per document family (e.g., notice minima, deposit scheme references).
+
+Artifacts: certificate.html, lawsSummary.md, doc.pdf/doc.docx.
+
+Pricing (UK v1)
+
+Contract £10; Rewrite £40; Translation £20.
+
+Custom Letter £5–£7 (+ free Day-7 follow-up).
+
+Small Claims Pack £19/£29 (blended ~£21).
+
+E-sign £3 (buyer only) across products.
+
+Tech Stack
+
+Next.js (App Router, ISR), Tailwind, TipTap (inline editor).
+
+Clerk (auth), Supabase (DB/storage/events), Stripe (Checkout/Webhooks), Resend (email D1/D7).
+
+Plausible (analytics). Vercel (hosting, on-demand revalidation).
+
+Packages: packages/{types,ai,infra,docgen,ui,search}.
+
+Security & Safety
+
+Passwordless auth via Clerk; JWT-guarded server actions.
+
+Rate-limit free outputs; watermark free PDFs; basic abuse filters.
+
+PII minimised in logs; signed URLs for downloads; Stripe webhook verify.
+
+KPIs (first 6–8 weeks)
+
+Ask → Wizard CTR 20–25% (amber <15%).
+
+Wizard → Paid (Ask cohort) 9–11%.
+
+Free → Custom Letter upgrade 8–10%; Custom → Pack 8–10% within 14 days.
+
+Pack refunds ≤ 2%; Letter e-sign attach 10–12%; Pack add-ons (e-sign ~15%, translation ~12%).
+
+Cost per free answer/letter £0.01–£0.05; per paid draft/pack £0.30–£1.50.
+
+Delivery Plan (fast)
+
+Week 1: Scaffold, Ask, Wizard stub, Letters hub (50 seeds), Stripe test, Resend templates.
+
+Week 2: Paid Custom Letter + Day-7 flow; Contract generation + editor + artifacts.
+
+Week 3: Small Claims Pack (3 issues), Analyser → Rewrite, Translation.
+
+Week 4: Letters → 500 via data import; Contracts → 185 slugs; SEO, sitemaps, deploy.
+
+Risks & Mitigation
+
+Jurisdiction drift → law-packs + assertions + spot-QA.
+
+SEO ramp variance → ISR pages + interlinking + submit sitemaps early.
+
+Support load → scope clarity, watermarks, automation (D1/D7), dashboard self-service.
+
+Ownership & Roles
+
+Product: funnel/UX, pricing tests, KPI reviews.
+
+Engineering: types first; server actions; ISR; webhooks; QA harness.
+
+Content/Legal Ops: law-packs maintenance; assertions; FAQ copy.
+
+Growth: Q&A/letters content, internal links, weekly reporting.

@@ -1,0 +1,74 @@
+1) Use your real origin in prod
+Swap the origin detection so it works on Vercel and locally:
+// src/app/sitemap.xml/route.ts
+export const dynamic = "force-static";
+
+export async function GET(req: Request) {
+  // Prefer a configured base URL in prod, fall back to the request host in dev
+  const envBase = process.env.NEXT_PUBLIC_SITE_URL; // e.g. https://contractheaven.co.uk
+  const origin = envBase ?? new URL(req.url).origin;
+
+  const paths = ["/", "/contracts", "/letters", "/tools", "/litigation", "/about", "/pricing", "/privacy", "/terms", "/dashboard"];
+  const urls = paths.map(p => `
+  <url>
+    <loc>${origin}${p}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>${p === "/" ? "1.0" : "0.7"}</priority>
+  </url>`).join("");
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
+
+  return new Response(xml.trim(), {
+    headers: { "Content-Type": "application/xml", "Cache-Control": "public, max-age=0, s-maxage=3600" }
+  });
+}
+
+Add to .env.local (and Vercel Project → Settings → Environment Variables):
+NEXT_PUBLIC_SITE_URL=https://contractheaven.co.uk
+
+2) Add dynamic entries for contracts/letters when you’re ready
+When slugs live in Supabase (or your filesystem), extend the sitemap to include them. Example with Supabase:
+// At top
+import { createClient } from "@supabase/supabase-js";
+
+export async function GET(req: Request) {
+  const envBase = process.env.NEXT_PUBLIC_SITE_URL;
+  const origin = envBase ?? new URL(req.url).origin;
+
+  // Pull a lightweight list of slugs only
+  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
+
+  const [{ data: contracts }, { data: letters }] = await Promise.all([
+    supabase.from("contracts").select("slug, jurisdiction").limit(5000),
+    supabase.from("letters").select("slug").limit(5000)
+  ]);
+
+  const staticPaths = ["/", "/contracts", "/letters", "/tools", "/litigation", "/about", "/pricing", "/privacy", "/terms", "/dashboard"];
+
+  const dynamicContractPaths =
+    (contracts ?? []).map(c => `/contracts/${c.jurisdiction}/${c.slug}`);
+
+  const dynamicLetterPaths =
+    (letters ?? []).map(l => `/letters/${l.slug}`);
+
+  const allPaths = [...staticPaths, ...dynamicContractPaths, ...dynamicLetterPaths];
+
+  const urls = allPaths.map(p => `
+  <url>
+    <loc>${origin}${p}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>${p === "/" ? "1.0" : "0.6"}</priority>
+  </url>`).join("");
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
+
+  return new Response(xml.trim(), { headers: { "Content-Type": "application/xml" } });
+}
+
+That’s it. The “no style information” line can be ignored; search engines don’t need styles. Your sitemap is good to go. Want me to wire this to Supabase now or keep it static for the moment?
