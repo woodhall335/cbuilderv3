@@ -10,7 +10,7 @@ export function renderClausesToHtml(
   return clauses
     .map((c) => {
       const tpl = Handlebars.compile(c.template ?? '');
-      const html = tpl(payload);
+      const html = tpl(payload).replace(/\n/g, '<br />');
       const title = c.title ? `<h2 class="ch-clause-title">${c.title}</h2>` : '';
       return `${title}<div class="ch-clause-body"><p>${html}</p></div>`;
     })

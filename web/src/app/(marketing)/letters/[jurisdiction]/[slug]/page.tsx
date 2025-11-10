@@ -10,9 +10,9 @@ interface Params {
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const document = await getDocument('contract', params.jurisdiction, params.slug);
+  const document = await getDocument('letter', params.jurisdiction, params.slug);
   if (!document) {
-    return { title: 'Contract not found | Contract Heaven' };
+    return { title: 'Letter not found | Contract Heaven' };
   }
   const jurisdictionLabel = getJurisdictionLabel(document.jurisdiction);
   return {
@@ -21,16 +21,16 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   };
 }
 
-export default async function ContractDetailPage({ params }: { params: Params }) {
-  const document = await getDocument('contract', params.jurisdiction, params.slug);
+export default async function LetterDetailPage({ params }: { params: Params }) {
+  const document = await getDocument('letter', params.jurisdiction, params.slug);
   if (!document) {
     notFound();
   }
   return (
     <DocumentDetail
       document={document}
-      ctaHref={`/wizard/contract/${params.jurisdiction}/${params.slug}`}
-      ctaLabel="Start this contract"
+      ctaHref={`/wizard/letter/${params.jurisdiction}/${params.slug}`}
+      ctaLabel="Start this letter"
     />
   );
 }
