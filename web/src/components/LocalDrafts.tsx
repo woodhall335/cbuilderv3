@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   loadDocumentsFromStorage,
@@ -10,11 +10,7 @@ import {
 import { getJurisdictionLabel } from '@/lib/jurisdictions';
 
 export function LocalDrafts() {
-  const [documents, setDocuments] = useState<StoredDocument[]>([]);
-
-  useEffect(() => {
-    setDocuments(loadDocumentsFromStorage());
-  }, []);
+  const [documents, setDocuments] = useState<StoredDocument[]>(() => loadDocumentsFromStorage());
 
   const remove = (id: string) => {
     removeDocumentFromStorage(id);
