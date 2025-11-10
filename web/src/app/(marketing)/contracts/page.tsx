@@ -1,35 +1,53 @@
-﻿import Link from "next/link";
-import { getAllContracts } from "@/lib/data";
+import DocumentCard from '@/components/DocumentCard';
+import { listDocumentSummaries } from '@/lib/catalog';
+import { getJurisdictionLabel } from '@/lib/jurisdictions';
 
-export default async function ContractsIndex() {
-  const contracts = await getAllContracts();
+export const metadata = {
+  title: 'Contract templates for the UK | Contract Heaven',
+  description:
+    'Browse curated contract templates for England & Wales, Scotland and Northern Ireland across employment, business, property and lending.',
+};
+
+export default async function ContractsPage() {
+  const documents = await listDocumentSummaries({ kind: 'contract' });
+  const grouped = documents.reduce<Record<string, typeof documents>>((acc, doc) => {
+    if (!acc[doc.jurisdiction]) {
+      acc[doc.jurisdiction] = [];
+    }
+    acc[doc.jurisdiction].push(doc);
+    return acc;
+  }, {});
+
   return (
-    <section className="max-w-7xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold">Contracts</h1>
-      <p className="mt-3 text-neutral-700">Browse by jurisdiction.</p>
-      <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-        {contracts.map(c => (
-          <li key={c.slug} className="rounded border p-4">
-            <h3 className="font-semibold">{c.title} ({c.jurisdiction})</h3>
-            <p className="text-sm text-neutral-600">{c.summary}</p>
-            <div className="mt-2">
-              <Link
-                className="text-blue-600 underline"
-                href={`/contracts/${c.jurisdiction}/${c.slug}`}
-              >
-                Open SEO page →
-              </Link>
-              <span className="mx-2 text-neutral-400">|</span>
-              <Link
-                className="text-blue-600 underline"
-                href={`/wizard/${c.jurisdiction}/${c.slug}`}
-              >
-                Start wizard →
-              </Link>
+    <main className="mx-auto max-w-6xl space-y-10 px-4 py-16">
+      <header className="space-y-3">
+        <h1 className="text-3xl font-semibold text-neutral-900">Contract templates</h1>
+        <p className="text-neutral-600">
+          Ready-to-run contracts curated for each UK jurisdiction. Start free, then upgrade to export professionally branded packs and unlock e-signatures.
+        </p>
+      </header>
+
+      <div className="space-y-12">
+        {Object.entries(grouped).map(([jurisdiction, items]) => (
+          <section key={jurisdiction} className="space-y-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-neutral-900">
+                {getJurisdictionLabel(jurisdiction)}
+              </h2>
+              <p className="text-sm text-neutral-600">{items.length} curated contracts.</p>
             </div>
-          </li>
+            <div className="grid gap-6 md:grid-cols-3">
+              {items.map((document) => (
+                <DocumentCard
+                  key={`${document.jurisdiction}-${document.slug}`}
+                  document={document}
+                  href={`/contracts/${document.jurisdiction}/${document.slug}`}
+                />
+              ))}
+            </div>
+          </section>
         ))}
-      </ul>
-    </section>
+      </div>
+    </main>
   );
 }
