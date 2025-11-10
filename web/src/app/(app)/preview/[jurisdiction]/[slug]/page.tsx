@@ -1,31 +1,23 @@
-// Server component (no "use client" here)
-import PreviewClient from "./preview-client";
+// src/app/(app)/preview/[jurisdiction]/[slug]/page.tsx
+import PreviewClient from './preview-client';
 
 export default async function PreviewPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ jurisdiction: string; slug: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  // Unwrap the Promises (Next 16 behavior)
+  // In this Next.js build, params is a Promise — unwrap it:
   const { jurisdiction, slug } = await params;
-  const sp = await searchParams;
-
-  // Parse ?payload=... if present
-  let payload: unknown = null;
-  try {
-    const raw = typeof sp.payload === "string" ? sp.payload : undefined;
-    payload = raw ? JSON.parse(decodeURIComponent(raw)) : null;
-  } catch {
-    payload = null;
-  }
 
   return (
-    <PreviewClient
-      jurisdiction={jurisdiction}
-      slug={slug}
-      payload={payload}
-    />
+    <section className="max-w-3xl mx-auto px-4 py-10">
+      <h1 className="text-2xl font-bold">Preview: {slug}</h1>
+      <p className="text-sm text-neutral-600 mt-1">
+        Jurisdiction: <span className="font-mono">{jurisdiction}</span>
+      </p>
+
+      {/* Client component handles fetching blueprint + saving */}
+      <PreviewClient jurisdiction={jurisdiction} slug={slug} />
+    </section>
   );
 }
