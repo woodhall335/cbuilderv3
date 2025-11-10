@@ -1,11 +1,14 @@
-﻿// src/app/(app)/dashboard/page.tsx
+// src/app/(app)/dashboard/page.tsx
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
 import { auth } from '@clerk/nextjs/server';
-import { supabaseServer } from '@/lib/supabase';
 import Link from 'next/link';
+import { supabaseServer } from '@/lib/supabase';
+import { LocalDrafts, LocalDraftsCta } from '@/components/LocalDrafts';
+
+const tableCell = 'py-2 pr-4';
 
 type Row = {
   id: string;
@@ -33,12 +36,25 @@ export default async function Dashboard() {
 
   if (mineErr) {
     return (
-      <section className="max-w-7xl mx-auto px-4 py-10">
-        <h1 className="text-2xl font-semibold mb-4">Your Documents</h1>
-        <div className="p-3 rounded bg-red-50 text-red-700 text-sm">
+      <main className="mx-auto max-w-7xl px-4 py-10">
+        <header className="mb-6 space-y-2">
+          <h1 className="text-3xl font-semibold text-neutral-900">Your documents</h1>
+          <p className="text-sm text-neutral-600">
+            Supabase keeps the definitive record of every document you generate while signed in.
+          </p>
+        </header>
+        <div className="rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           Failed to load documents: {mineErr.message}
         </div>
-      </section>
+        <section className="mt-12 space-y-4">
+          <h2 className="text-2xl font-semibold text-neutral-900">Local drafts</h2>
+          <p className="text-sm text-neutral-600">
+            Drafts that you save from the wizard in this browser show here alongside your Supabase history.
+          </p>
+          <LocalDraftsCta />
+          <LocalDrafts />
+        </section>
+      </main>
     );
   }
 
@@ -60,61 +76,75 @@ export default async function Dashboard() {
   }
 
   return (
-    <section className="max-w-7xl mx-auto px-4 py-10">
-      <h1 className="text-2xl font-semibold">Your Documents</h1>
-
-      {debugFallback && (
-        <p className="mt-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
-          Showing 3 most recent documents (debug view shows all owners if yours is empty).
-          If you see your rows here but not in “Your Documents”, confirm each row’s <code>owner_id</code> equals your Clerk <code>userId</code>.
-        </p>
-      )}
-
-      <div className="mt-4 overflow-x-auto">
-        <table className="min-w-full text-sm">
-          <thead>
-            <tr className="text-left border-b">
-              <th className="py-2 pr-4">Title</th>
-              <th className="py-2 pr-4">Jurisdiction</th>
-              <th className="py-2 pr-4">Status</th>
-              <th className="py-2 pr-4">Lock</th>
-              {debugFallback && <th className="py-2 pr-4">Owner (debug)</th>}
-              <th className="py-2 pr-4">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((d) => (
-              <tr key={d.id} className="border-b">
-                <td className="py-2 pr-4">{d.title ?? d.slug ?? d.id}</td>
-                <td className="py-2 pr-4 font-mono">{d.jurisdiction ?? '—'}</td>
-                <td className="py-2 pr-4">{d.status ?? '—'}</td>
-                <td className="py-2 pr-4">
-                  {d.locked_at ? new Date(d.locked_at).toLocaleString() : '—'}
-                </td>
-                {debugFallback && (
-                  <td className="py-2 pr-4 font-mono">{(d as Row).owner_id ?? '—'}</td>
-                )}
-                <td className="py-2 pr-4">
-                  <Link className="text-blue-600 underline" href={`/document/${d.id}`}>
-                    View
-                  </Link>
-                  <span className="mx-1">·</span>
-                  <a className="text-blue-600 underline" href={`/api/documents/${d.id}/export`}>
-                    Export
-                  </a>
-                </td>
+    <main className="mx-auto max-w-7xl space-y-12 px-4 py-10">
+      <section className="space-y-3">
+        <header className="space-y-2">
+          <h1 className="text-3xl font-semibold text-neutral-900">Your documents</h1>
+          <p className="text-sm text-neutral-600">
+            Supabase keeps the definitive record of every document you generate while signed in.
+          </p>
+        </header>
+        <div className="overflow-x-auto rounded-2xl border border-neutral-200 bg-white shadow-sm">
+          <table className="min-w-full text-sm">
+            <thead>
+              <tr className="border-b bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+                <th className={tableCell}>Title</th>
+                <th className={tableCell}>Jurisdiction</th>
+                <th className={tableCell}>Status</th>
+                <th className={tableCell}>Lock</th>
+                {debugFallback && <th className={tableCell}>Owner (debug)</th>}
+                <th className={tableCell}>Action</th>
               </tr>
-            ))}
-            {items.length === 0 && (
-              <tr>
-                <td className="py-6 text-neutral-600" colSpan={debugFallback ? 6 : 5}>
-                  No documents yet — create one via a wizard.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </section>
+            </thead>
+            <tbody>
+              {items.map((d) => (
+                <tr key={d.id} className="border-b last:border-b-0">
+                  <td className={tableCell}>{d.title ?? d.slug ?? d.id}</td>
+                  <td className={`${tableCell} font-mono`}>{d.jurisdiction ?? '—'}</td>
+                  <td className={tableCell}>{d.status ?? '—'}</td>
+                  <td className={tableCell}>{d.locked_at ? new Date(d.locked_at).toLocaleString() : '—'}</td>
+                  {debugFallback && (
+                    <td className={`${tableCell} font-mono`}>{(d as Row).owner_id ?? '—'}</td>
+                  )}
+                  <td className={tableCell}>
+                    <Link className="text-blue-600 underline" href={`/document/${d.id}`}>
+                      View
+                    </Link>
+                    <span className="mx-1">·</span>
+                    <a className="text-blue-600 underline" href={`/api/documents/${d.id}/export`}>
+                      Export
+                    </a>
+                  </td>
+                </tr>
+              ))}
+              {items.length === 0 && (
+                <tr>
+                  <td className="py-6 text-neutral-600" colSpan={debugFallback ? 6 : 5}>
+                    No documents yet — create one via a wizard.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        {debugFallback && (
+          <p className="text-xs text-amber-700">
+            Showing 3 most recent documents (debug view shows all owners if yours is empty). If you see your rows here but not
+            in “Your Documents”, confirm each row’s <code>owner_id</code> equals your Clerk <code>userId</code>.
+          </p>
+        )}
+      </section>
+
+      <section className="space-y-4">
+        <header className="space-y-2">
+          <h2 className="text-2xl font-semibold text-neutral-900">Local drafts</h2>
+          <p className="text-sm text-neutral-600">
+            Drafts that you save from the wizard in this browser show here alongside your Supabase history.
+          </p>
+        </header>
+        <LocalDraftsCta />
+        <LocalDrafts />
+      </section>
+    </main>
   );
 }
