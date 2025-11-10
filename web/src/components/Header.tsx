@@ -4,17 +4,29 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 
-export default function Header() {
-  const [open, setOpen] = useState(false);
+type NavLinksProps = {
+  onClick?: () => void;
+};
 
-  const NavLinks = ({ onClick }: { onClick?: () => void }) => (
+function NavLinks({ onClick }: NavLinksProps) {
+  return (
     <>
-      <Link href="/contracts" onClick={onClick}>Contracts</Link>
-      <Link href="/letters" onClick={onClick}>Letters</Link>
-      <Link href="/tools" onClick={onClick}>Tools</Link>
-      <Link href="/litigation" onClick={onClick}>Litigation</Link>
+      <Link href="/contracts" onClick={onClick}>
+        Contracts
+      </Link>
+      <Link href="/letters" onClick={onClick}>
+        Letters
+      </Link>
+      <Link href="/tools" onClick={onClick}>
+        Tools
+      </Link>
+      <Link href="/litigation" onClick={onClick}>
+        Litigation
+      </Link>
       <SignedIn>
-        <Link href="/dashboard" onClick={onClick}>Dashboard</Link>
+        <Link href="/dashboard" onClick={onClick}>
+          Dashboard
+        </Link>
         <UserButton afterSignOutUrl="/" />
       </SignedIn>
       <SignedOut>
@@ -26,6 +38,10 @@ export default function Header() {
       </SignedOut>
     </>
   );
+}
+
+export default function Header() {
+  const [open, setOpen] = useState(false);
 
   return (
     <header className="border-b">

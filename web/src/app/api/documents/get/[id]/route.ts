@@ -33,6 +33,6 @@ export async function GET(
     return NextResponse.json({ ok: false, error: 'Not found' }, { status: 404 });
   }
 
-  const { owner_id, ...doc } = data as any;
+  const { owner_id: _owner_id, ...doc } = data as any;
   return NextResponse.json({ ok: true, doc });
 }

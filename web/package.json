@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "format": "prettier --write .",
     "sitemap": "next-sitemap",
     "gen:blueprints": "tsx scripts/generate-blueprints.ts",
