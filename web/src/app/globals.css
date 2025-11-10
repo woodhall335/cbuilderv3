@@ -24,3 +24,24 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.ch-document {
+  background: #ffffff;
+  color: #1f2933;
+  line-height: 1.6;
+}
+
+.ch-document p {
+  margin: 0 0 0.75rem;
+}
+
+.ch-document .ch-clause-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
+  color: #111827;
+}
+
+.ch-document .ch-clause-body {
+  margin-bottom: 1.25rem;
+}
